@@ -1,0 +1,25 @@
+semester,course_code,course_name,credits,syllabus,status
+1,MA101,Engineering Mathematics I,4,Matrices; Calculus; Differential Equations,Completed
+1,PH101,Engineering Physics,4,Waves; Optics; Semiconductors,Completed
+1,CS101,Programming in C,3,Variables; Loops; Functions,Completed
+2,MA201,Engineering Mathematics II,4,Integral Calculus; Laplace Transforms,Completed
+2,CS201,Data Structures,4,Stacks; Queues; Trees; Graphs,Completed
+2,EC201,Digital Electronics,3,Logic Gates; Boolean Algebra,Completed
+3,CS301,Operating Systems,4,Processes; Scheduling; Memory Management,In Progress
+3,CS302,Database Management Systems,4,SQL; Normalization; Transactions,In Progress
+3,CS303,Python Programming,3,Functions; OOP; NumPy,In Progress
+4,CS401,Computer Networks,4,OSI; TCP/IP; Routing,Not Started
+4,CS402,Software Engineering,3,SDLC; Testing; Agile,Not Started
+4,CS403,Java Programming,3,OOP; Inheritance; Exception Handling,Not Started
+5,CS501,Design and Analysis of Algorithms,4,Sorting; Searching; Complexity,Not Started
+5,CS502,Web Technology,3,HTML; CSS; JavaScript,Not Started
+5,CS503,Artificial Intelligence,3,Search; Knowledge Representation,Not Started
+6,CS601,Machine Learning,4,Regression; Classification; Clustering,Not Started
+6,CS602,Cloud Computing,3,Virtualization; Cloud Services,Not Started
+6,CS603,Compiler Design,3,Lexical Analysis; Parsing,Not Started
+7,CS701,Deep Learning,4,Neural Networks; CNN; RNN,Not Started
+7,CS702,Information Security,3,Cryptography; Network Security,Not Started
+7,CS703,Project Work I,3,Project Planning; Implementation,Not Started
+8,CS801,Major Project,8,Design; Development; Testing,Not Started
+8,CS802,Internship,4,Industry Training; Report,Not Started
+8,CS803,Professional Elective,3,Advanced Computing Topics,Not Started
