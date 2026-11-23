@@ -5,6 +5,7 @@ from google import genai
 from pathlib import Path
 from datetime import date
 import time
+from supabase import create_client
 
 st.set_page_config(
     page_title="My Engineering Degree OS",
@@ -13,6 +14,14 @@ st.set_page_config(
 )
 
 DATA = Path("data")
+SUPABASE_URL = st.secrets["SUPABASE_URL"]
+SUPABASE_KEY = st.secrets["SUPABASE_PUBLISHABLE_KEY"]
+
+if "supabase" not in st.session_state:
+    st.session_state.supabase = create_client(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    )
 
 def load_csv(filename):
     path = DATA / filename
@@ -43,6 +52,40 @@ pages = [
 ]
 
 page = st.sidebar.radio("Navigation", pages)
+# Supabase Authentication
+db = st.session_state.supabase
+
+if "user" not in st.session_state:
+    st.session_state.user = None
+
+if st.session_state.user is None:
+    st.sidebar.subheader("🔐 Account Login")
+
+    with st.sidebar.form("login_form"):
+        email = st.text_input("Email")
+        password = st.text_input("Password", type="password")
+        login_button = st.form_submit_button("Login")
+
+        if login_button:
+            try:
+                response = db.auth.sign_in_with_password({
+                    "email": email,
+                    "password": password
+                })
+
+                st.session_state.user = response.user
+                st.sidebar.success("Login successful!")
+                st.rerun()
+
+            except Exception as e:
+                st.sidebar.error(f"Login failed: {e}")
+
+else:
+    st.sidebar.success("Logged in")
+    if st.sidebar.button("Logout"):
+        db.auth.sign_out()
+        st.session_state.user = None
+        st.rerun()
 
 # Dashboard
 if page == "Dashboard":
@@ -356,6 +399,75 @@ elif page == "Scorecard":
 
         st.metric("Total Score", f"{total_score} / {total_marks}")
         st.metric("Score Percentage", f"{percentage:.1f}%")
+        st.divider()
+    st.subheader("📚 My Saved Scores")
+
+    if st.session_state.user is None:
+        st.info("Please log in to save your scores.")
+    else:
+        with st.form("save_score_form"):
+            st.write("Add a new assessment score")
+
+            course_code = st.text_input("Course Code")
+            assessment_name = st.text_input("Assessment Name")
+
+            col1, col2 = st.columns(2)
+
+            with col1:
+                marks_obtained = st.number_input(
+                    "Marks Obtained", min_value=0.0, step=1.0
+                )
+
+            with col2:
+                total_marks = st.number_input(
+                    "Total Marks", min_value=1.0, step=1.0
+                )
+
+            exam_date = st.date_input("Exam Date")
+
+            save_score = st.form_submit_button("Save Score")
+
+            if save_score:
+                if not course_code.strip() or not assessment_name.strip():
+                    st.error("Please enter all required details.")
+                elif marks_obtained > total_marks:
+                    st.error("Marks obtained cannot exceed total marks.")
+                else:
+                    try:
+                        db.table("scores").insert({
+                            "course_code": course_code.strip(),
+                            "assessment_name": assessment_name.strip(),
+                            "marks_obtained": marks_obtained,
+                            "total_marks": total_marks,
+                            "exam_date": exam_date.isoformat()
+                        }).execute()
+
+                        st.success("Score saved successfully!")
+                        st.rerun()
+
+                    except Exception as e:
+                        st.error(f"Unable to save score: {e}")
+
+        st.write("### Your Saved Scores")
+
+        try:
+            response = (
+                db.table("scores")
+                .select("*")
+                .order("created_at", desc=True)
+                .execute()
+            )
+
+            if response.data:
+                st.dataframe(
+                    pd.DataFrame(response.data),
+                    width="stretch"
+                )
+            else:
+                st.info("You haven't saved any scores yet.")
+
+        except Exception as e:
+            st.error(f"Unable to load scores: {e}")
 # Plan & Checklist page
 elif page == "Plan & Checklist":
     st.title("Plan & Checklist")
